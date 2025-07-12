@@ -1,4 +1,3 @@
-import { ClassNameValue } from "tailwind-merge";
 import { Group, GroupItem } from "./group.component";
 import { useProviders } from "./providers";
 
