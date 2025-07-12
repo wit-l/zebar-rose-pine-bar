@@ -1,0 +1,28 @@
+{
+  "name": "solidjs-ts",
+  "version": "0.0.0",
+  "description": "",
+  "scripts": {
+    "build": "tsc --noEmit && vite build",
+    "dev": "vite build --watch"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.5.0",
+    "@tauri-apps/plugin-shell": "^2.2.2",
+    "pure-snow.js": "^2.1.0",
+    "solid-js": "1.9.7",
+    "solid-motionone": "^1.0.4",
+    "tailwind-merge": "^3.3.1",
+    "zebar": "^3.1.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.10",
+    "@thearturca/shared-configs": "^1.1.0",
+    "@types/node": "^22.15.32",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.10",
+    "typescript": "5.8.3",
+    "vite": "6.3.5",
+    "vite-plugin-solid": "2.11.6"
+  }
+}
