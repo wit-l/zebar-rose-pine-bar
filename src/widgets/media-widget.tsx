@@ -2,8 +2,7 @@ import {
   createEffect,
   createMemo,
   createSignal,
-  on,
-  onMount,
+  onCleanup,
   Show,
 } from "solid-js";
 import { MediaSession } from "zebar";
@@ -33,7 +32,7 @@ function calculateDistance(
     textRef.getBoundingClientRect().width / 2 +
     (Number(fontSize?.value) ?? 0) / 1.1;
   const containerWidth = containerRef.getBoundingClientRect().width;
-  const containersCount = textWidth / containerWidth;
+  const containersCount = textWidth / (containerWidth || 200);
   const distance = containersCount * containerWidth;
 
   return distance;
@@ -58,7 +57,7 @@ function calculateDuration(
   return duration;
 }
 
-function checkTextSize(
+function checkShouldScroll(
   textRef: HTMLElement,
   containerRef: HTMLElement,
 ): boolean {
@@ -71,50 +70,67 @@ function checkTextSize(
 export function MediaWidget() {
   const providers = useProviders();
   const [duration, setDuration] = createSignal(20);
-  const [isMounted, setIsMounted] = createSignal(false);
-  const [isTextBig, setIsTextBig] = createSignal(false);
+  const [shouldScroll, setShouldScroll] = createSignal(false);
   const title = createMemo(() => {
-    if (!providers.media?.currentSession) {
-      return "";
-    }
-
-    return getSessionTitle(providers.media?.currentSession);
+    return providers.media?.currentSession
+      ? getSessionTitle(providers.media.currentSession)
+      : "";
   });
 
   let textRef: HTMLSpanElement | undefined;
   let containerRef: HTMLDivElement | undefined;
+  let resizeObserver: ResizeObserver | null = null;
 
-  createEffect(
-    on([title, isMounted], () => {
-      if (!textRef || !providers.media?.currentSession || !containerRef) {
-        setDuration(20);
-        return;
-      }
+  createEffect(() => {
+    const currentTitle = title();
+    if (!textRef || !containerRef || !currentTitle) {
+      console.log("No textRef or containerRef or currentTitle");
+      setDuration(0);
+      setShouldScroll(false);
+      return;
+    }
 
-      let timeout: NodeJS.Timeout;
-
-      if (isMounted()) {
-        setDuration(calculateDuration(textRef, containerRef));
-        setIsTextBig(checkTextSize(textRef, containerRef));
-      } else {
-        timeout = setTimeout(() => {
+    function recalculate() {
+      setTimeout(() => {
+        setDuration(0);
+        setShouldScroll(false);
+        if (textRef && containerRef) {
           setDuration(calculateDuration(textRef, containerRef));
-          setIsTextBig(checkTextSize(textRef, containerRef));
-        }, 500);
-      }
-
-      return () => {
-        if (timeout) {
-          clearTimeout(timeout);
+          setShouldScroll(checkShouldScroll(textRef, containerRef));
         }
-      };
-    }),
-  );
+      }, 500);
+    }
 
-  onMount(() => {
-    setTimeout(() => {
-      setIsMounted(true);
-    }, 500);
+    // Use requestAnimationFrame for reliable DOM measurements
+    const frameId = requestAnimationFrame(() => {
+      try {
+        recalculate();
+      } catch (e) {
+        console.error("Error calculating media dimensions:", e);
+        setDuration(0);
+        setShouldScroll(false);
+      }
+    });
+
+    if (!resizeObserver) {
+      resizeObserver = new ResizeObserver(() => {
+        recalculate();
+      });
+    }
+
+    resizeObserver.observe(containerRef);
+    resizeObserver.observe(textRef);
+
+    recalculate();
+
+    onCleanup(() => {
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+        resizeObserver = null;
+      }
+    });
+
+    return () => cancelAnimationFrame(frameId);
   });
 
   return (
@@ -146,7 +162,7 @@ export function MediaWidget() {
               {providers.media?.currentSession?.isPlaying ? "󰏥" : ""}
             </Motion.button>
             <Presence>
-              <Show when={title() && duration()}>
+              <Show when={title()}>
                 <div
                   ref={containerRef}
                   class="overflow-clip max-w-[200px] inline-flex justify-start items-center"
@@ -154,25 +170,24 @@ export function MediaWidget() {
                 >
                   <Motion.span
                     ref={textRef}
-                    class="block w-fit"
                     initial={{
-                      x: 0,
+                      x: "100%",
                     }}
                     animate={{
-                      x: isTextBig()
-                        ? textRef && containerRef
+                      x:
+                        shouldScroll() && textRef && containerRef
                           ? calculateAnimation(textRef, containerRef)
-                          : ["30%", "-30%", "30%"]
-                        : 0,
+                          : 0,
                     }}
                     exit={{ x: "-100%" }}
                     transition={{
                       duration: duration(),
-                      repeat: Infinity,
+                      repeat: shouldScroll() ? Infinity : 0,
                       easing: "linear",
                     }}
+                    class="block w-fit"
                   >
-                    <Show when={isTextBig()} fallback={title()}>
+                    <Show when={shouldScroll()} fallback={title()}>
                       {title()} | {title()}
                     </Show>
                   </Motion.span>
