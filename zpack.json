@@ -1,10 +1,10 @@
 {
   "$schema": "https://github.com/glzr-io/zebar/raw/v3.1.0/resources/zpack-schema.json",
   "name": "bar-rose-pine",
-  "version": "0.0.0",
-  "description": "",
-  "tags": [],
-  "previewImages": [],
+  "version": "0.0.1",
+  "description": "Simple bar with rose-pine theme and komorebi support workspaces support",
+  "tags": ["workspaces", "komorebi", "rose-pine", "media"],
+  "previewImages": ["assets/preview_1.png"],
   "repositoryUrl": "",
   "widgets": [
     {
@@ -15,9 +15,7 @@
       "focused": false,
       "resizable": false,
       "transparent": true,
-      "includeFiles": [
-        "**/**"
-      ],
+      "includeFiles": ["**/**"],
       "caching": {
         "defaultDuration": 604800,
         "rules": []
