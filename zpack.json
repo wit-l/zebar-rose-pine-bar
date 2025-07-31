@@ -4,8 +4,8 @@
   "version": "0.0.1",
   "description": "Simple bar with rose-pine theme and komorebi support workspaces support",
   "tags": ["workspaces", "komorebi", "rose-pine", "media"],
-  "previewImages": ["assets/preview_1.png"],
-  "repositoryUrl": "",
+  "previewImages": ["assets\\preview_1.png"],
+  "repositoryUrl": "https://github.com/thearturca/zebar-rose-pine-bar",
   "widgets": [
     {
       "name": "bar",
