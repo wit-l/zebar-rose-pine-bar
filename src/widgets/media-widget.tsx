@@ -2,6 +2,7 @@ import {
   createEffect,
   createMemo,
   createSignal,
+  on,
   onCleanup,
   Show,
 } from "solid-js";
@@ -28,10 +29,12 @@ function calculateDistance(
   const fontSize = textRef.computedStyleMap().get("font-size") as
     | CSSKeywordValue
     | undefined;
-  const textWidth =
-    textRef.getBoundingClientRect().width / 2 +
-    (Number(fontSize?.value) ?? 0) / 1.1;
+  console.log("media:fontSize", fontSize?.value);
+  const charSize = (Number(fontSize?.value) ?? 0) / 1.1;
+  const textWidth = textRef.getBoundingClientRect().width + charSize * 2;
+  console.log("media:text", textWidth);
   const containerWidth = containerRef.getBoundingClientRect().width;
+  console.log("media:container", containerWidth);
   const containersCount = textWidth / (containerWidth || 200);
   const distance = containersCount * containerWidth;
 
@@ -81,60 +84,61 @@ export function MediaWidget() {
   let containerRef: HTMLDivElement | undefined;
   let resizeObserver: ResizeObserver | null = null;
 
-  createEffect(() => {
-    const currentTitle = title();
-    if (!textRef || !containerRef || !currentTitle) {
-      console.log("No textRef or containerRef or currentTitle");
-      setDuration(0);
-      setShouldScroll(false);
-      return;
-    }
-
-    function recalculate() {
-      setTimeout(() => {
+  createEffect(
+    on(title, (currentTitle) => {
+      if (!textRef || !containerRef || !currentTitle) {
+        console.log("No textRef or containerRef or currentTitle");
         setDuration(0);
         setShouldScroll(false);
-        if (textRef && containerRef) {
-          setDuration(calculateDuration(textRef, containerRef));
-          setShouldScroll(checkShouldScroll(textRef, containerRef));
+        return;
+      }
+
+      function recalculate() {
+        setTimeout(() => {
+          setDuration(0);
+          setShouldScroll(false);
+          if (textRef && containerRef) {
+            setDuration(calculateDuration(textRef, containerRef));
+            setShouldScroll(checkShouldScroll(textRef, containerRef));
+          }
+        }, 500);
+      }
+
+      // Use requestAnimationFrame for reliable DOM measurements
+      const frameId = requestAnimationFrame(() => {
+        try {
+          recalculate();
+        } catch (e) {
+          console.error("Error calculating media dimensions:", e);
+          setDuration(0);
+          setShouldScroll(false);
         }
-      }, 500);
-    }
-
-    // Use requestAnimationFrame for reliable DOM measurements
-    const frameId = requestAnimationFrame(() => {
-      try {
-        recalculate();
-      } catch (e) {
-        console.error("Error calculating media dimensions:", e);
-        setDuration(0);
-        setShouldScroll(false);
-      }
-    });
-
-    if (!resizeObserver) {
-      resizeObserver = new ResizeObserver(() => {
-        recalculate();
       });
-    }
 
-    resizeObserver.observe(containerRef);
-    resizeObserver.observe(textRef);
-
-    recalculate();
-
-    onCleanup(() => {
-      if (resizeObserver) {
-        resizeObserver.disconnect();
-        resizeObserver = null;
+      if (!resizeObserver) {
+        resizeObserver = new ResizeObserver(() => {
+          recalculate();
+        });
       }
-    });
 
-    return () => cancelAnimationFrame(frameId);
-  });
+      resizeObserver.observe(containerRef);
+      resizeObserver.observe(textRef);
+
+      recalculate();
+
+      onCleanup(() => {
+        if (resizeObserver) {
+          resizeObserver.disconnect();
+          resizeObserver = null;
+        }
+      });
+
+      return () => cancelAnimationFrame(frameId);
+    }),
+  );
 
   return (
-    <Presence>
+    <Presence exitBeforeEnter>
       <Show when={providers.media?.currentSession}>
         <GroupItem>
           <Motion.div
@@ -161,35 +165,55 @@ export function MediaWidget() {
             >
               {providers.media?.currentSession?.isPlaying ? "󰏥" : ""}
             </Motion.button>
-            <Presence>
+            <Presence exitBeforeEnter>
               <Show when={title()}>
                 <div
                   ref={containerRef}
                   class="overflow-clip max-w-[200px] inline-flex justify-start items-center"
                   title={title()}
                 >
-                  <Motion.span
+                  <span
+                    class="whitespace-nowrap absolute opacity-0 pointer-events-none block w-fit"
                     ref={textRef}
+                  >
+                    {title()}
+                  </span>
+                  <Motion.span
                     initial={{
-                      x: "100%",
+                      x: "-100%",
                     }}
                     animate={{
-                      x:
-                        shouldScroll() && textRef && containerRef
-                          ? calculateAnimation(textRef, containerRef)
-                          : 0,
+                      x: "0%",
                     }}
-                    exit={{ x: "-100%" }}
+                    exit={{
+                      x: "-100%",
+                    }}
                     transition={{
-                      duration: duration(),
-                      repeat: shouldScroll() ? Infinity : 0,
-                      easing: "linear",
+                      easing: [0.32, 0.72, 0, 1],
+                      duration: 0.25,
                     }}
-                    class="block w-fit"
                   >
-                    <Show when={shouldScroll()} fallback={title()}>
-                      {title()} | {title()}
-                    </Show>
+                    <Motion.span
+                      initial={{
+                        x: "100%",
+                      }}
+                      animate={{
+                        x:
+                          shouldScroll() && textRef && containerRef
+                            ? calculateAnimation(textRef, containerRef)
+                            : 0,
+                      }}
+                      transition={{
+                        duration: shouldScroll() ? duration() : 0.25,
+                        repeat: shouldScroll() ? Infinity : 0,
+                        easing: shouldScroll() ? "linear" : [0.32, 0.72, 0, 1],
+                      }}
+                      class="block w-fit"
+                    >
+                      <Show when={shouldScroll()} fallback={title()}>
+                        {title()} | {title()}
+                      </Show>
+                    </Motion.span>
                   </Motion.span>
                 </div>
               </Show>
