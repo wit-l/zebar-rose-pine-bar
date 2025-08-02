@@ -9,8 +9,8 @@ import {
 import { MediaSession } from "zebar";
 import { Motion } from "solid-motionone";
 import { Presence } from "solid-motionone";
-import { useProviders } from "../providers";
-import { GroupItem } from "../group.component";
+import { useProviders } from "@providers/index";
+import { GroupItem } from "@components/group.component";
 
 const getSessionTitle = (session: MediaSession) => {
   if (session.artist) {
@@ -29,12 +29,9 @@ function calculateDistance(
   const fontSize = textRef.computedStyleMap().get("font-size") as
     | CSSKeywordValue
     | undefined;
-  console.log("media:fontSize", fontSize?.value);
   const charSize = (Number(fontSize?.value) ?? 0) / 1.1;
   const textWidth = textRef.getBoundingClientRect().width + charSize * 2;
-  console.log("media:text", textWidth);
   const containerWidth = containerRef.getBoundingClientRect().width;
-  console.log("media:container", containerWidth);
   const containersCount = textWidth / (containerWidth || 200);
   const distance = containersCount * containerWidth;
 

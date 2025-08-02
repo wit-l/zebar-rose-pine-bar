@@ -7,20 +7,19 @@
     "dev": "vite build --watch"
   },
   "dependencies": {
-    "@tauri-apps/api": "^2.5.0",
-    "@tauri-apps/plugin-shell": "^2.2.2",
-    "pure-snow.js": "^2.1.0",
+    "@tauri-apps/api": "^2.7.0",
+    "@tauri-apps/plugin-shell": "^2.3.0",
     "solid-js": "1.9.7",
     "solid-motionone": "^1.0.4",
     "tailwind-merge": "^3.3.1",
     "zebar": "^3.1.1"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.10",
+    "@tailwindcss/postcss": "^4.1.11",
     "@thearturca/shared-configs": "^1.1.0",
-    "@types/node": "^22.15.32",
+    "@types/node": "^22.17.0",
     "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.10",
+    "tailwindcss": "^4.1.11",
     "typescript": "5.8.3",
     "vite": "6.3.5",
     "vite-plugin-solid": "2.11.6"

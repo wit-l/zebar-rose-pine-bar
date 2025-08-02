@@ -8,8 +8,8 @@
   "repositoryUrl": "https://github.com/thearturca/zebar-rose-pine-bar",
   "widgets": [
     {
-      "name": "bar",
-      "htmlPath": "./dist/index.html",
+      "name": "bar-komorebi",
+      "htmlPath": "./dist/src/widgets/bar/komorebi/index.html",
       "zOrder": "normal",
       "shownInTaskbar": false,
       "focused": false,

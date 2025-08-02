@@ -12,6 +12,12 @@
     "types": ["vite/client"],
     "lib": ["dom", "dom.iterable", "esnext"],
     "noEmit": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      "@features/*": ["./src/features/*"],
+      "@providers/*": ["./src/providers/*"],
+      "@components/*": ["./src/components/*"]
+    }
   }
 }
