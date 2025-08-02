@@ -1,20 +1,20 @@
-import { ParentComponent } from "solid-js";
-import { Motion } from "solid-motionone";
+import { ParentComponent, splitProps } from "solid-js";
+import { Motion, Options, motion } from "solid-motionone";
 import { ClassNameValue, twMerge } from "tailwind-merge";
+motion;
 
 export type GroupProps = {
   class?: ClassNameValue;
   classList?: Record<string, boolean>;
   onClick?: () => void;
+  animationOptions?: Options;
 };
 
 export const Group: ParentComponent<GroupProps> = (props) => {
+  const [local] = splitProps(props, ["animationOptions"]);
   return (
     <Motion.div
-      initial={{ y: "-100%" }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5, easing: [0.32, 0.72, 0, 1] }}
-      translate="yes"
+      {...local.animationOptions}
       class={twMerge(
         "h-[32px] max-h-[32px] flex flex-row justify-center items-center gap-3 bg-rose-pine-base text-rose-pine-text border-rose-pine-highlight-high border-[2px] w-fit rounded-[1.5rem] border-solid py-0 px-[1.2rem]",
         "hover:border-rose-pine-gold transition-colors",

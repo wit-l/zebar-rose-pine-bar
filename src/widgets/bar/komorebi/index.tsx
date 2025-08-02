@@ -1,6 +1,7 @@
 /* @refresh reload */
 import "@/index.css";
 import { render } from "solid-js/web";
+import { createMotion, motion } from "solid-motionone";
 import { ProvidersProvider } from "@providers/index";
 import { FocusedWindowTitleKomorebiWidget } from "@features/focused-window-title.komorebi.widget";
 import { Group } from "@components/group.component";
@@ -10,12 +11,26 @@ import { MediaWidget } from "@features/media.widget";
 import { MetricsWidget } from "@features/metrics.widget";
 import { KeyboardLayoutWidget } from "@features/keyboard-layout.widget";
 import { DateTimeWidget } from "@features/date-time.widget";
+motion;
 
 render(() => <App />, document.getElementById("root")!);
 
 export function LeftGroup() {
   return (
-    <Group class="justify-self-start justify-start">
+    <Group
+      animationOptions={{
+        initial: {
+          x: "-200%",
+        },
+        animate: {
+          x: 0,
+        },
+        transition: {
+          duration: 2.0,
+        },
+      }}
+      class="justify-self-start justify-start"
+    >
       <WorkspacesKomorebiWidget />
       <LayoutKomorebiWidget />
       <MediaWidget />
@@ -25,7 +40,20 @@ export function LeftGroup() {
 
 export function CenterGroup() {
   return (
-    <Group class="justify-self-center">
+    <Group
+      animationOptions={{
+        initial: {
+          y: "-200%",
+        },
+        animate: {
+          y: 0,
+        },
+        transition: {
+          duration: 2.0,
+        },
+      }}
+      class="justify-self-center"
+    >
       <FocusedWindowTitleKomorebiWidget />
     </Group>
   );
@@ -33,7 +61,20 @@ export function CenterGroup() {
 
 export function RightGroup() {
   return (
-    <Group class="justify-self-end justify-end">
+    <Group
+      animationOptions={{
+        initial: {
+          x: "200%",
+        },
+        animate: {
+          x: 0,
+        },
+        transition: {
+          duration: 2.0,
+        },
+      }}
+      class="justify-self-end justify-end"
+    >
       <MetricsWidget />
       <KeyboardLayoutWidget />
       <DateTimeWidget />
