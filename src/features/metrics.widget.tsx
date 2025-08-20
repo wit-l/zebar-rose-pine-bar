@@ -1,8 +1,36 @@
 import { useProviders } from "@providers/index";
 import { GroupItem } from "@components/group.component";
-import { animate } from "motion";
-import { createEffect } from "solid-js";
+import {
+  animate,
+  AnimationPlaybackControlsWithThen,
+  MotionValue,
+} from "motion";
+import { Accessor, createEffect, createMemo, EffectFunction } from "solid-js";
 import { useMotionValue } from "@/motion/hooks";
+
+function metricsAnimation(
+  rawMotionValue: MotionValue<number>,
+  metric: Accessor<number | undefined>,
+): EffectFunction<
+  AnimationPlaybackControlsWithThen | undefined,
+  AnimationPlaybackControlsWithThen
+> {
+  return (prev) => {
+    const control = animate(rawMotionValue, metric() || 0, {
+      duration: 1,
+      ease: "circOut",
+      autoplay: Boolean(!prev),
+    });
+
+    if (prev) {
+      prev?.then(() => {
+        control.play();
+      });
+    }
+
+    return control;
+  };
+}
 
 export function MetricsWidget() {
   const providers = useProviders();
@@ -10,32 +38,35 @@ export function MetricsWidget() {
   const memoryUsage = useMotionValue(0);
   const weather = useMotionValue(0);
 
-  createEffect<ReturnType<typeof animate>>((prev) => {
-    prev?.stop();
-    const usage = providers.cpu?.usage;
-    return animate(cpuUsage.raw, usage || 0, {
-      duration: 1,
-      ease: "circOut",
-    });
-  });
+  createEffect(
+    metricsAnimation(
+      cpuUsage.raw,
+      createMemo(() => {
+        const usage = providers.cpu?.usage;
+        return usage;
+      }),
+    ),
+  );
 
-  createEffect<ReturnType<typeof animate>>((prev) => {
-    prev?.stop();
-    const usage = providers.memory?.usage;
-    return animate(memoryUsage.raw, usage || 0, {
-      duration: 1,
-      ease: "circOut",
-    });
-  });
+  createEffect(
+    metricsAnimation(
+      memoryUsage.raw,
+      createMemo(() => {
+        const usage = providers.memory?.usage;
+        return usage;
+      }),
+    ),
+  );
 
-  createEffect<ReturnType<typeof animate>>((prev) => {
-    prev?.stop();
-    const celsiusTemp = providers.weather?.celsiusTemp;
-    return animate(weather.raw, celsiusTemp || 0, {
-      duration: 1,
-      ease: "circOut",
-    });
-  });
+  createEffect(
+    metricsAnimation(
+      weather.raw,
+      createMemo(() => {
+        const usage = providers.weather?.celsiusTemp;
+        return usage;
+      }),
+    ),
+  );
 
   return (
     <GroupItem>
