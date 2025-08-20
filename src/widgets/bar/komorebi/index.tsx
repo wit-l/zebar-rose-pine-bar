@@ -1,7 +1,7 @@
 /* @refresh reload */
 import "@/index.css";
 import { render } from "solid-js/web";
-import { createMotion, motion } from "solid-motionone";
+import { motion } from "solid-motionone";
 import { ProvidersProvider } from "@providers/index";
 import { FocusedWindowTitleKomorebiWidget } from "@features/focused-window-title.komorebi.widget";
 import { Group } from "@components/group.component";
