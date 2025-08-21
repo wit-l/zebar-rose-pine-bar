@@ -30,10 +30,12 @@ export const Group: ParentComponent<GroupProps> = (props) => {
 };
 
 export const GroupItem: ParentComponent<GroupProps> = (props) => {
+  const [local] = splitProps(props, ["animationOptions"]);
   return (
     <div
+      {...local.animationOptions}
       class={twMerge(
-        "transition-transform h-full inline-flex items-center gap-2 text-ellipsis overflow-hidden whitespace-nowrap",
+        "transition-transform h-full inline-flex items-center gap-2 text-ellipsis overflow-hidden whitespace-nowrap leading-[1.5]",
         props.class,
       )}
       onClick={props.onClick}

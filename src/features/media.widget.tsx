@@ -72,9 +72,13 @@ export function MediaWidget() {
   const [duration, setDuration] = createSignal(20);
   const [shouldScroll, setShouldScroll] = createSignal(false);
   const title = createMemo(() => {
-    return providers.media?.currentSession
-      ? getSessionTitle(providers.media.currentSession)
-      : "";
+    const session = providers.media?.currentSession;
+
+    if (!session) {
+      return undefined;
+    }
+
+    return getSessionTitle(session);
   });
 
   let textRef: HTMLSpanElement | undefined;
@@ -135,7 +139,7 @@ export function MediaWidget() {
   );
 
   return (
-    <Presence exitBeforeEnter>
+    <Presence exitBeforeEnter initial={false}>
       <Show when={providers.media?.currentSession}>
         <GroupItem>
           <Motion.div
@@ -149,7 +153,7 @@ export function MediaWidget() {
             }}
           >
             <Motion.button
-              class="hover:text-rose-pine-gold text-2xl origin-left inline-flex items-center !leading-[1.5]"
+              class="hover:text-rose-pine-gold text-2xl origin-left inline-flex items-center"
               initial={{ fontSize: "0", opacity: 0, scale: 0 }}
               animate={{ fontSize: "1.5rem", opacity: 1, scale: 1 }}
               exit={{ fontSize: "0", opacity: 0, scale: 0 }}
@@ -162,7 +166,7 @@ export function MediaWidget() {
             >
               {providers.media?.currentSession?.isPlaying ? "󰏥" : ""}
             </Motion.button>
-            <Presence exitBeforeEnter>
+            <Presence exitBeforeEnter initial={false}>
               <Show when={title()}>
                 <div
                   ref={containerRef}
@@ -191,6 +195,7 @@ export function MediaWidget() {
                     }}
                   >
                     <Motion.span
+                      class="block w-fit"
                       initial={{
                         x: "100%",
                       }}
@@ -205,7 +210,6 @@ export function MediaWidget() {
                         repeat: shouldScroll() ? Infinity : 0,
                         easing: shouldScroll() ? "linear" : [0.32, 0.72, 0, 1],
                       }}
-                      class="block w-fit"
                     >
                       <Show when={shouldScroll()} fallback={title()}>
                         {title()} | {title()}
