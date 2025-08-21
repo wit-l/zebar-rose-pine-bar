@@ -11,6 +11,7 @@ import { MediaWidget } from "@features/media.widget";
 import { MetricsWidget } from "@features/metrics.widget";
 import { KeyboardLayoutWidget } from "@features/keyboard-layout.widget";
 import { DateTimeWidget } from "@features/date-time.widget";
+import { onMount } from "solid-js";
 motion;
 
 render(() => <App />, document.getElementById("root")!);
@@ -83,6 +84,15 @@ export function RightGroup() {
 }
 
 function App() {
+  onMount(() => {
+    setTimeout(() => {
+      for (let i = 0; i < document.styleSheets.length; i++) {
+        if (document.styleSheets[i]?.href?.includes("/__zebar/normalize.css")) {
+          document.styleSheets[i]!.disabled = true;
+        }
+      }
+    }, 2000);
+  });
   return (
     <ProvidersProvider>
       <div class="h-full grid grid-cols-3 px-[16px] items-end">

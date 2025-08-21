@@ -1,4 +1,4 @@
-import { ParentComponent, splitProps } from "solid-js";
+import { JSX, ParentComponent, splitProps } from "solid-js";
 import { Motion, Options, motion } from "solid-motionone";
 import { ClassNameValue, twMerge } from "tailwind-merge";
 motion;
@@ -6,7 +6,8 @@ motion;
 export type GroupProps = {
   class?: ClassNameValue;
   classList?: Record<string, boolean>;
-  onClick?: () => void;
+  onClick?: JSX.EventHandler<HTMLDivElement, MouseEvent>;
+  onContextMenu?: JSX.EventHandler<HTMLDivElement, MouseEvent>;
   animationOptions?: Options;
 };
 
@@ -36,6 +37,7 @@ export const GroupItem: ParentComponent<GroupProps> = (props) => {
         props.class,
       )}
       onClick={props.onClick}
+      onContextMenu={props.onContextMenu}
     >
       {props.children}
     </div>

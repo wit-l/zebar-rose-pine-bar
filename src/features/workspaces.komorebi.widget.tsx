@@ -1,10 +1,40 @@
-import { createMemo, Index, Show } from "solid-js";
+import { createMemo, Index, Show, Switch, Match } from "solid-js";
+import { Motion, Presence } from "solid-motionone";
 import { GroupItem } from "@components/group.component";
 import { shellExec } from "zebar";
 import { useProviders } from "@providers/index";
+import { createStoredSignal } from "@/components/signal-storage.hook";
+
+enum WorkspaceDisplayMode {
+  normal = "normal",
+  icons = "icons",
+}
 
 export function WorkspacesKomorebiWidget() {
   const providers = useProviders();
+
+  const displayModeStorageKey = createMemo(() => {
+    const deviceId = providers.komorebi?.currentMonitor.deviceId;
+    if (!deviceId) {
+      return undefined;
+    }
+
+    return `${deviceId}:workspaces-display-mode`;
+  });
+
+  const [displayMode, setDisplayMode] = createStoredSignal(
+    WorkspaceDisplayMode.normal,
+    displayModeStorageKey,
+  );
+
+  const toggleDisplayMode = () => {
+    setDisplayMode(
+      displayMode() === WorkspaceDisplayMode.normal
+        ? WorkspaceDisplayMode.icons
+        : WorkspaceDisplayMode.normal,
+    );
+  };
+
   const focusWrokspace = async (monitorIndex: number, index: number) => {
     await shellExec("komorebic", [
       "focus-monitor-workspace",
@@ -20,48 +50,81 @@ export function WorkspacesKomorebiWidget() {
   });
 
   return (
-    <GroupItem class="overflow-visible">
+    <GroupItem
+      class="overflow-visible"
+      onContextMenu={(e) => {
+        e.preventDefault();
+        toggleDisplayMode();
+      }}
+    >
       <Index each={providers.komorebi?.currentMonitor.workspaces}>
         {(workspace) => (
-          <Show
-            when={
-              workspace().tilingContainers.length > 0 ||
-              workspace().floatingWindows.length > 0 ||
-              workspace().maximizedWindow ||
-              workspace().monocleContainer ||
-              workspace() === currentMonitorWorkspace()
-            }
-          >
-            <button
-              class="transition-all h-[90%] rounded-[0.25rem] overflow-hidden hover:scale-105 hover:border-rose-pine-gold border-solid border-t-1 border-transparent inline-flex items-center justify-center"
-              classList={{
-                "text-rose-pine-gold font-bold":
-                  workspace() === currentMonitorWorkspace(),
-                "!text-[1.5rem] !mt-[1px] px-2":
-                  workspace() !==
-                  providers.komorebi?.currentMonitor.workspaces[
-                    providers.komorebi?.currentMonitor.focusedWorkspaceIndex
-                  ],
-              }}
-              onClick={() =>
-                focusWrokspace(
-                  providers.komorebi?.allMonitors.indexOf(
-                    providers.komorebi?.currentMonitor,
-                  ) ?? 0,
-                  providers.komorebi?.currentMonitor.workspaces.indexOf(
-                    workspace(),
-                  ) ?? 0,
-                )
+          <Presence exitBeforeEnter initial={false}>
+            <Show
+              when={
+                workspace().tilingContainers.length > 0 ||
+                workspace().floatingWindows.length > 0 ||
+                workspace().maximizedWindow ||
+                workspace().monocleContainer ||
+                workspace() === currentMonitorWorkspace()
               }
             >
-              <Show
-                when={workspace() === currentMonitorWorkspace()}
-                fallback={workspace().name?.split(" ")[0]}
+              <Motion.button
+                class="origin-left transition-colors h-[90%] rounded-[0.25rem] overflow-hidden hover:scale-105 hover:border-rose-pine-gold border-solid border-t-1 border-transparent inline-flex items-center justify-center"
+                classList={{
+                  "text-rose-pine-gold font-bold":
+                    workspace() === currentMonitorWorkspace(),
+                  "px-2":
+                    displayMode() === WorkspaceDisplayMode.icons &&
+                    workspace() !==
+                      providers.komorebi?.currentMonitor.workspaces[
+                        providers.komorebi?.currentMonitor.focusedWorkspaceIndex
+                      ],
+                }}
+                onClick={() =>
+                  focusWrokspace(
+                    providers.komorebi?.allMonitors.indexOf(
+                      providers.komorebi?.currentMonitor,
+                    ) ?? 0,
+                    providers.komorebi?.currentMonitor.workspaces.indexOf(
+                      workspace(),
+                    ) ?? 0,
+                  )
+                }
+                initial={{
+                  scale: 0,
+                }}
+                animate={{
+                  scale: 1,
+                  fontSize:
+                    displayMode() === WorkspaceDisplayMode.icons &&
+                    workspace() !==
+                      providers.komorebi?.currentMonitor.workspaces[
+                        providers.komorebi?.currentMonitor.focusedWorkspaceIndex
+                      ]
+                      ? "1.5rem"
+                      : "13px",
+                }}
+                exit={{
+                  fontSize: 0,
+                }}
               >
-                {workspace().name?.split(" ")?.[1] ?? workspace().name}
-              </Show>
-            </button>
-          </Show>
+                <Switch>
+                  <Match when={displayMode() === WorkspaceDisplayMode.normal}>
+                    {workspace().name}
+                  </Match>
+                  <Match when={displayMode() === WorkspaceDisplayMode.icons}>
+                    <Show
+                      when={workspace() === currentMonitorWorkspace()}
+                      fallback={workspace().name?.split(" ")[0]}
+                    >
+                      {workspace().name?.split(" ")?.[1] ?? workspace().name}
+                    </Show>
+                  </Match>
+                </Switch>
+              </Motion.button>
+            </Show>
+          </Presence>
         )}
       </Index>
     </GroupItem>
