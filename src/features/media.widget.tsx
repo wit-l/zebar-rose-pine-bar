@@ -11,6 +11,7 @@ import { Motion } from "solid-motionone";
 import { Presence } from "solid-motionone";
 import { useProviders } from "@providers/index";
 import { GroupItem } from "@components/group.component";
+import { FaSolidCirclePlay, FaSolidCirclePause } from "solid-icons/fa";
 
 const getSessionTitle = (session: MediaSession) => {
   if (session.artist) {
@@ -164,7 +165,11 @@ export function MediaWidget() {
                 });
               }}
             >
-              {providers.media?.currentSession?.isPlaying ? "󰏥" : ""}
+              {providers.media?.currentSession?.isPlaying ? (
+                <FaSolidCirclePause class="w-4 h-4" />
+              ) : (
+                <FaSolidCirclePlay class="w-4 h-4" />
+              )}
             </Motion.button>
             <Presence exitBeforeEnter initial={false}>
               <Show when={title()}>

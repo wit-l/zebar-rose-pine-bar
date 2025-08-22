@@ -5,8 +5,23 @@ import {
   AnimationPlaybackControlsWithThen,
   MotionValue,
 } from "motion";
-import { Accessor, createEffect, createMemo, EffectFunction } from "solid-js";
+import {
+  Accessor,
+  createEffect,
+  createMemo,
+  EffectFunction,
+  ParentProps,
+} from "solid-js";
 import { useMotionValue } from "@/motion/hooks";
+import { FaSolidMemory } from "solid-icons/fa";
+import { FaSolidSun } from "solid-icons/fa";
+import { RiDeviceCpuLine } from "solid-icons/ri";
+
+function Metric(props: ParentProps) {
+  return (
+    <span class="flex items-center justify-center gap-1">{props.children}</span>
+  );
+}
 
 function metricsAnimation(
   rawMotionValue: MotionValue<number>,
@@ -69,30 +84,34 @@ export function MetricsWidget() {
   );
 
   return (
-    <GroupItem>
-      <i class="text-2xl text-rose-pine-rose"></i>
-      {Math.round(cpuUsage.get()).toLocaleString(undefined, {})}%
-      <i class="text-2xl text-rose-pine-pine"></i>
-      {Math.round(memoryUsage.get()).toLocaleString(undefined, {})}%
-      <i
-        class="text-2xl transition-colors"
-        classList={{
-          "text-rose-pine-foam": weather.get() <= -20,
+    <GroupItem class="justify-end">
+      <Metric>
+        <RiDeviceCpuLine class="w-4 h-4 text-rose-pine-rose" />
+        {Math.round(cpuUsage.get()).toLocaleString(undefined, {})}%
+      </Metric>
+      <Metric>
+        <FaSolidMemory class="w-4 h-4 text-rose-pine-pine" />
+        {Math.round(memoryUsage.get()).toLocaleString(undefined, {})}%
+      </Metric>
+      <Metric>
+        <FaSolidSun
+          class="w-3.5 h-3.5 transition-colors"
+          classList={{
+            "text-rose-pine-foam": weather.get() <= -20,
 
-          "text-rose-pine-pine": weather.get() <= -10,
+            "text-rose-pine-pine": weather.get() <= -10,
 
-          "text-rose-pine-iris": weather.get() <= 5,
+            "text-rose-pine-iris": weather.get() <= 5,
 
-          "text-rose-pine-rose": weather.get() <= 10,
+            "text-rose-pine-rose": weather.get() <= 14,
 
-          "text-rose-pine-gold": weather.get() <= 25,
+            "text-rose-pine-gold": weather.get() <= 25,
 
-          "text-rose-pine-love": weather.get() >= 25,
-        }}
-      >
-        󰖙
-      </i>
-      {Math.round(weather.get())}°
+            "text-rose-pine-love": weather.get() >= 25,
+          }}
+        />
+        {Math.round(weather.get())}°
+      </Metric>
     </GroupItem>
   );
 }
