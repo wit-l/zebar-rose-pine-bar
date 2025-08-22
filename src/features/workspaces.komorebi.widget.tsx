@@ -59,7 +59,7 @@ export function WorkspacesKomorebiWidget() {
     >
       <Index each={providers.komorebi?.currentMonitor.workspaces}>
         {(workspace) => (
-          <Presence exitBeforeEnter initial={false}>
+          <Presence initial={false}>
             <Show
               when={
                 workspace().tilingContainers.length > 0 ||
