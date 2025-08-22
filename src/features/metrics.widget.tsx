@@ -19,10 +19,10 @@ function metricsAnimation(
     const control = animate(rawMotionValue, metric() || 0, {
       duration: 1,
       ease: "circOut",
-      autoplay: Boolean(!prev),
+      autoplay: Boolean(!prev || prev.state === "finished"),
     });
 
-    if (prev) {
+    if (prev && prev.state === "running") {
       prev?.then(() => {
         control.play();
       });
