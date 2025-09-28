@@ -4,6 +4,8 @@
   "description": "",
   "scripts": {
     "build": "tsc --noEmit && vite build",
+    "prepublish": "pnpm build",
+    "publish": "zebar publish",
     "dev": "vite build --watch"
   },
   "dependencies": {
