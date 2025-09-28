@@ -7,7 +7,8 @@
     "workspaces",
     "komorebi",
     "rose-pine",
-    "media"
+    "media",
+    "glazewm"
   ],
   "previewImages": [
     "assets\\preview_1.png"
