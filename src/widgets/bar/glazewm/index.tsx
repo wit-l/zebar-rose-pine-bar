@@ -3,15 +3,14 @@ import "@/index.css";
 import { render } from "solid-js/web";
 import { motion } from "solid-motionone";
 import { ProvidersProvider } from "@providers/index";
-import { FocusedWindowTitleKomorebiWidget } from "@features/focused-window-title.komorebi.widget";
 import { Group } from "@components/group.component";
-import { WorkspacesKomorebiWidget } from "@features/workspaces.komorebi.widget";
-import { LayoutKomorebiWidget } from "@features/layout.komorebi.widget";
 import { MediaWidget } from "@features/media.widget";
 import { MetricsWidget } from "@features/metrics.widget";
 import { KeyboardLayoutWidget } from "@features/keyboard-layout.widget";
 import { DateTimeWidget } from "@features/date-time.widget";
 import { onMount } from "solid-js";
+import { WorkspacesGlazewmWidget } from "@/features/workspaces.glazewm.widget";
+import { FocusedWindowTitleGlazewmWidget } from "@/features/focused-window-title.glazewm.widget";
 motion;
 
 render(() => <App />, document.getElementById("root")!);
@@ -32,8 +31,7 @@ export function LeftGroup() {
       }}
       class="justify-self-start justify-start"
     >
-      <WorkspacesKomorebiWidget />
-      <LayoutKomorebiWidget />
+      <WorkspacesGlazewmWidget />
       <MediaWidget />
     </Group>
   );
@@ -55,7 +53,7 @@ export function CenterGroup() {
       }}
       class="justify-self-center"
     >
-      <FocusedWindowTitleKomorebiWidget />
+      <FocusedWindowTitleGlazewmWidget />
     </Group>
   );
 }
@@ -94,7 +92,7 @@ function App() {
     }, 2000);
   });
   return (
-    <ProvidersProvider WmType="komorebi">
+    <ProvidersProvider WmType="glazewm">
       <div class="h-full grid grid-cols-3 px-[16px] items-end">
         <LeftGroup />
         <CenterGroup />

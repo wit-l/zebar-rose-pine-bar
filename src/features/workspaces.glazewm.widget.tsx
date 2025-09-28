@@ -1,16 +1,15 @@
 import { createMemo, Index, Show, Switch, Match } from "solid-js";
 import { Motion, Presence } from "solid-motionone";
 import { GroupItem } from "@components/group.component";
-import { shellExec } from "zebar";
 import { useProviders } from "@providers/index";
 import { createStoredSignal } from "@/components/signal-storage.hook";
 import { WorkspaceDisplayMode } from "@/components/workspaces.types";
 
-export function WorkspacesKomorebiWidget() {
+export function WorkspacesGlazewmWidget() {
   const providers = useProviders();
 
   const displayModeStorageKey = createMemo(() => {
-    const deviceId = providers.komorebi?.currentMonitor.deviceId;
+    const deviceId = providers.glazewm?.currentMonitor.deviceName;
     if (!deviceId) {
       return undefined;
     }
@@ -31,19 +30,9 @@ export function WorkspacesKomorebiWidget() {
     );
   };
 
-  const focusWrokspace = async (monitorIndex: number, index: number) => {
-    await shellExec("komorebic", [
-      "focus-monitor-workspace",
-      monitorIndex.toString(),
-      index.toString(),
-    ]);
+  const focusWrokspace = async (workspaceId: string) => {
+    await providers.glazewm?.runCommand(`focus --workspace ${workspaceId}`);
   };
-
-  const currentMonitorWorkspace = createMemo(() => {
-    return providers.komorebi?.currentMonitor.workspaces[
-      providers.komorebi?.currentMonitor.focusedWorkspaceIndex
-    ];
-  });
 
   return (
     <GroupItem
@@ -53,17 +42,11 @@ export function WorkspacesKomorebiWidget() {
         toggleDisplayMode();
       }}
     >
-      <Index each={providers.komorebi?.currentMonitor.workspaces}>
+      <Index each={providers.glazewm?.currentMonitor.children}>
         {(workspace) => (
           <Presence exitBeforeEnter>
             <Show
-              when={
-                workspace().tilingContainers.length > 0 ||
-                workspace().floatingWindows.length > 0 ||
-                workspace().maximizedWindow ||
-                workspace().monocleContainer ||
-                workspace() === currentMonitorWorkspace()
-              }
+              when={workspace().children.length > 0 || workspace().isDisplayed}
             >
               <Motion.span
                 class="origin-left inline-flex items-center justify-center h-full w-full py-1"
@@ -80,34 +63,18 @@ export function WorkspacesKomorebiWidget() {
                 <Motion.button
                   class="origin-left transition-colors h-[90%] rounded-[0.25rem] overflow-hidden hover:scale-105 hover:border-rose-pine-gold border-solid border-t-1 border-transparent inline-flex items-center justify-center"
                   classList={{
-                    "text-rose-pine-gold font-bold":
-                      workspace() === currentMonitorWorkspace(),
+                    "text-rose-pine-gold font-bold": workspace().isDisplayed,
                     "px-2":
                       displayMode() === WorkspaceDisplayMode.icons &&
-                      workspace() !==
-                        providers.komorebi?.currentMonitor.workspaces[
-                          providers.komorebi?.currentMonitor
-                            .focusedWorkspaceIndex
-                        ],
+                      !workspace().isDisplayed,
                   }}
-                  onClick={() =>
-                    focusWrokspace(
-                      providers.komorebi?.allMonitors.indexOf(
-                        providers.komorebi?.currentMonitor,
-                      ) ?? 0,
-                      providers.komorebi?.currentMonitor.workspaces.indexOf(
-                        workspace(),
-                      ) ?? 0,
-                    )
-                  }
+                  onClick={() => {
+                    focusWrokspace(workspace().name);
+                  }}
                   animate={{
                     fontSize:
                       displayMode() === WorkspaceDisplayMode.icons &&
-                      workspace() !==
-                        providers.komorebi?.currentMonitor.workspaces[
-                          providers.komorebi?.currentMonitor
-                            .focusedWorkspaceIndex
-                        ]
+                      !workspace().isDisplayed
                         ? "1.5rem"
                         : "13px",
                   }}
@@ -117,14 +84,22 @@ export function WorkspacesKomorebiWidget() {
                 >
                   <Switch>
                     <Match when={displayMode() === WorkspaceDisplayMode.normal}>
-                      {workspace().name}
+                      {workspace().displayName ?? workspace().name}
                     </Match>
                     <Match when={displayMode() === WorkspaceDisplayMode.icons}>
                       <Show
-                        when={workspace() === currentMonitorWorkspace()}
-                        fallback={workspace().name?.split(" ")[0]}
+                        when={workspace().isDisplayed}
+                        fallback={
+                          (workspace().displayName ?? workspace().name)?.split(
+                            " ",
+                          )[0]
+                        }
                       >
-                        {workspace().name?.split(" ")?.[1] ?? workspace().name}
+                        {(workspace().displayName ?? workspace().name)?.split(
+                          " ",
+                        )?.[1] ??
+                          workspace().displayName ??
+                          workspace().name}
                       </Show>
                     </Match>
                   </Switch>

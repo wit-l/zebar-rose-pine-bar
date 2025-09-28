@@ -24,6 +24,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         "bar.komorebi": resolve(widgetsDir, "bar/komorebi", "index.html"),
+        "bar.glazewm": resolve(widgetsDir, "bar/glazewm", "index.html"),
       },
     },
   },

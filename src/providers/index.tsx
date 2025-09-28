@@ -9,6 +9,7 @@ export const providers = zebar.createProviderGroup({
   weather: { type: "weather" },
   date: { type: "date", formatting: "t" },
   komorebi: { type: "komorebi" },
+  glazewm: { type: "glazewm" },
   keyboard: { type: "keyboard" },
   media: { type: "media" },
   tray: { type: "systray" },
@@ -22,15 +23,31 @@ export function useProviders() {
   return useContext(ProvidersContext);
 }
 
-export function ProvidersProvider(props: ParentProps) {
+export function ProvidersProvider(
+  props: ParentProps<{ WmType?: "glazewm" | "komorebi" }>,
+) {
   const [output, setOutput] = createStore(providers.outputMap);
+
+  let wmProvider: zebar.KomorebiProvider | zebar.GlazeWmProvider | undefined;
+
+  if (props.WmType) {
+    wmProvider = zebar.createProvider({
+      type: props.WmType,
+    });
+  }
 
   onMount(() => {
     providers.onOutput((outputMap) => setOutput(outputMap));
+    wmProvider?.onOutput((outputMap) =>
+      setOutput({
+        [props.WmType!]: outputMap,
+      }),
+    );
   });
 
   onCleanup(() => {
     providers.stopAll();
+    wmProvider?.stop();
   });
 
   return (
