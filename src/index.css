@@ -42,10 +42,11 @@
 
 body {
   font-family:
+    "Maple Mono NF CN",
     Hack Nerd Font Mono,
     ui-monospace,
     monospace;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 html,
