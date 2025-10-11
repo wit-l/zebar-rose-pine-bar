@@ -8,6 +8,7 @@ export const providers = zebar.createProviderGroup({
   memory: { type: "memory" },
   weather: { type: "weather" },
   date: { type: "date" },
+  battery: { type: "battery" },
   komorebi: { type: "komorebi" },
   glazewm: { type: "glazewm" },
   keyboard: { type: "keyboard" },

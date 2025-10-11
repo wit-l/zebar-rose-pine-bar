@@ -13,9 +13,25 @@ import {
   ParentProps,
 } from "solid-js";
 import { useMotionValue } from "@/motion/hooks";
-import { FaSolidMemory } from "solid-icons/fa";
-import { FaSolidSun } from "solid-icons/fa";
+import {
+  FaSolidBatteryFull,
+  FaSolidBatteryThreeQuarters,
+  FaSolidBatteryHalf,
+  FaSolidBatteryQuarter,
+  FaSolidBatteryEmpty,
+  FaSolidMemory,
+  FaSolidSun,
+} from "solid-icons/fa";
 import { RiDeviceCpuLine } from "solid-icons/ri";
+import { Dynamic } from "solid-js/web";
+
+const batterIconsOpts = (chargePercent: number) => {
+  if (chargePercent >= 90) return FaSolidBatteryFull;
+  if (chargePercent >= 75) return FaSolidBatteryThreeQuarters;
+  if (chargePercent >= 50) return FaSolidBatteryHalf;
+  if (chargePercent >= 20) return FaSolidBatteryQuarter;
+  return FaSolidBatteryEmpty;
+};
 
 function Metric(props: ParentProps) {
   return (
@@ -52,6 +68,7 @@ export function MetricsWidget() {
   const cpuUsage = useMotionValue(0);
   const memoryUsage = useMotionValue(0);
   const weather = useMotionValue(0);
+  const battery = useMotionValue(0);
 
   createEffect(
     metricsAnimation(
@@ -79,6 +96,16 @@ export function MetricsWidget() {
       createMemo(() => {
         const usage = providers.weather?.celsiusTemp;
         return usage;
+      }),
+    ),
+  );
+
+  createEffect(
+    metricsAnimation(
+      battery.raw,
+      createMemo(() => {
+        const chargePercent = providers.battery?.chargePercent;
+        return chargePercent;
       }),
     ),
   );
@@ -111,6 +138,10 @@ export function MetricsWidget() {
           }}
         />
         {Math.round(weather.get())}°
+      </Metric>
+      <Metric>
+        <Dynamic component={batterIconsOpts(battery.get())} class="w-4 h-4" />
+        {Math.round(battery.get())}%
       </Metric>
     </GroupItem>
   );
