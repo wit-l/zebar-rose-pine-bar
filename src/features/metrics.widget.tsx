@@ -26,9 +26,9 @@ import { RiDeviceCpuLine } from "solid-icons/ri";
 import { Dynamic } from "solid-js/web";
 
 const batterIconsOpts = (chargePercent: number) => {
-  if (chargePercent >= 90) return FaSolidBatteryFull;
-  if (chargePercent >= 75) return FaSolidBatteryThreeQuarters;
-  if (chargePercent >= 50) return FaSolidBatteryHalf;
+  if (chargePercent >= 80) return FaSolidBatteryFull;
+  if (chargePercent >= 60) return FaSolidBatteryThreeQuarters;
+  if (chargePercent >= 40) return FaSolidBatteryHalf;
   if (chargePercent >= 20) return FaSolidBatteryQuarter;
   return FaSolidBatteryEmpty;
 };
@@ -140,7 +140,10 @@ export function MetricsWidget() {
         {Math.round(weather.get())}°
       </Metric>
       <Metric>
-        <Dynamic component={batterIconsOpts(battery.get())} class="w-4 h-4" />
+        <Dynamic
+          component={batterIconsOpts(battery.get())}
+          class="w-4 h-4 transition-colors"
+        />
         {Math.round(battery.get())}%
       </Metric>
     </GroupItem>
