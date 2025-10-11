@@ -150,7 +150,7 @@ export function MetricsWidget() {
         {isCharging() && <BsLightningCharge />}
         <Dynamic
           component={batterIconsOpts(battery.get())}
-          class="w-4 h-4 transition-colors"
+          class="w-5 h-5 transition-colors"
         />
         {Math.round(battery.get())}%
       </Metric>
