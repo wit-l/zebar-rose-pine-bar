@@ -9,6 +9,7 @@ import {
   Accessor,
   createEffect,
   createMemo,
+  createSignal,
   EffectFunction,
   ParentProps,
 } from "solid-js";
@@ -22,6 +23,7 @@ import {
   FaSolidMemory,
   FaSolidSun,
 } from "solid-icons/fa";
+import { BsLightningCharge } from "solid-icons/bs";
 import { RiDeviceCpuLine } from "solid-icons/ri";
 import { Dynamic } from "solid-js/web";
 
@@ -69,6 +71,11 @@ export function MetricsWidget() {
   const memoryUsage = useMotionValue(0);
   const weather = useMotionValue(0);
   const battery = useMotionValue(0);
+  const [isCharging, setIsCharging] = createSignal(false);
+
+  createEffect(() => {
+    setIsCharging(providers.battery?.isCharging || false);
+  });
 
   createEffect(
     metricsAnimation(
@@ -140,6 +147,7 @@ export function MetricsWidget() {
         {Math.round(weather.get())}°
       </Metric>
       <Metric>
+        {isCharging() && <BsLightningCharge />}
         <Dynamic
           component={batterIconsOpts(battery.get())}
           class="w-4 h-4 transition-colors"
