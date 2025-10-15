@@ -12,6 +12,7 @@ import {
   createSignal,
   EffectFunction,
   ParentProps,
+  Show,
 } from "solid-js";
 import { useMotionValue } from "@/motion/hooks";
 import {
@@ -21,19 +22,75 @@ import {
   FaSolidBatteryQuarter,
   FaSolidBatteryEmpty,
   FaSolidMemory,
-  FaSolidSun,
 } from "solid-icons/fa";
+import {
+  WiDayCloudy,
+  WiDayLightning,
+  WiDayRain,
+  WiDaySnow,
+  WiDaySprinkle,
+  WiDaySunny,
+  WiNightAltCloudy,
+  WiNightAltLightning,
+  WiNightAltRain,
+  WiNightAltSnow,
+  WiNightAltSprinkle,
+  WiNightClear,
+} from "solid-icons/wi";
 import { BsLightningCharge } from "solid-icons/bs";
 import { RiDeviceCpuLine } from "solid-icons/ri";
 import { Dynamic } from "solid-js/web";
+import { WeatherStatus } from "zebar";
 
-const batterIconsOpts = (chargePercent: number) => {
+function batterIconsOpts(chargePercent: number) {
   if (chargePercent >= 80) return FaSolidBatteryFull;
   if (chargePercent >= 60) return FaSolidBatteryThreeQuarters;
   if (chargePercent >= 40) return FaSolidBatteryHalf;
   if (chargePercent >= 20) return FaSolidBatteryQuarter;
   return FaSolidBatteryEmpty;
-};
+}
+
+function weatherIconsOpts(weatherStatus: WeatherStatus) {
+  switch (weatherStatus) {
+    case "clear_day":
+      return WiDaySunny;
+    case "clear_night":
+      return WiNightClear;
+    case "cloudy_day":
+      return WiDayCloudy;
+    case "cloudy_night":
+      return WiNightAltCloudy;
+    case "light_rain_day":
+      return WiDaySprinkle;
+    case "light_rain_night":
+      return WiNightAltSprinkle;
+    case "heavy_rain_day":
+      return WiDayRain;
+    case "heavy_rain_night":
+      return WiNightAltRain;
+    case "snow_day":
+      return WiDaySnow;
+    case "snow_night":
+      return WiNightAltSnow;
+    case "thunder_day":
+      return WiDayLightning;
+    case "thunder_night":
+      return WiNightAltLightning;
+  }
+}
+
+function getWeatherClass(temperature: number) {
+  const prefix = "text-rose-pine-";
+  let suffix = "";
+  if (temperature >= 25) suffix = "love";
+  else if (temperature >= 15) suffix = "gold";
+  else if (temperature >= 5) suffix = "rose";
+  else if (temperature >= -10) suffix = "iris";
+  else if (temperature >= -20) suffix = "pine";
+  else suffix = "foam";
+  const className = prefix + suffix;
+  return className;
+}
 
 function Metric(props: ParentProps) {
   return (
@@ -69,12 +126,18 @@ export function MetricsWidget() {
   const providers = useProviders();
   const cpuUsage = useMotionValue(0);
   const memoryUsage = useMotionValue(0);
-  const weather = useMotionValue(0);
+  const temperature = useMotionValue(0);
   const battery = useMotionValue(0);
   const [isCharging, setIsCharging] = createSignal(false);
+  const [weatherStatus, setWeatherStatus] =
+    createSignal<WeatherStatus>("clear_day");
 
   createEffect(() => {
     setIsCharging(providers.battery?.isCharging || false);
+  });
+
+  createEffect(() => {
+    setWeatherStatus(providers.weather?.status || "clear_day");
   });
 
   createEffect(
@@ -99,7 +162,7 @@ export function MetricsWidget() {
 
   createEffect(
     metricsAnimation(
-      weather.raw,
+      temperature.raw,
       createMemo(() => {
         const usage = providers.weather?.celsiusTemp;
         return usage;
@@ -128,26 +191,18 @@ export function MetricsWidget() {
         {Math.round(memoryUsage.get()).toLocaleString(undefined, {})}%
       </Metric>
       <Metric>
-        <FaSolidSun
-          class="w-3.5 h-3.5 transition-colors"
-          classList={{
-            "text-rose-pine-foam": weather.get() <= -20,
-
-            "text-rose-pine-pine": weather.get() <= -10,
-
-            "text-rose-pine-iris": weather.get() <= 5,
-
-            "text-rose-pine-rose": weather.get() <= 14,
-
-            "text-rose-pine-gold": weather.get() <= 25,
-
-            "text-rose-pine-love": weather.get() >= 25,
-          }}
+        <Dynamic
+          component={weatherIconsOpts(weatherStatus())}
+          class={
+            "w-5 h-5 transition-colors " + getWeatherClass(temperature.get())
+          }
         />
-        {Math.round(weather.get())}°
+        {Math.round(temperature.get())}°
       </Metric>
       <Metric>
-        {isCharging() && <BsLightningCharge />}
+        <Show when={isCharging()}>
+          <BsLightningCharge />
+        </Show>
         <Dynamic
           component={batterIconsOpts(battery.get())}
           class="w-5 h-5 transition-colors"
