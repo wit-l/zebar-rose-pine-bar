@@ -197,7 +197,7 @@ export function MetricsWidget() {
             "w-5 h-5 transition-colors " + getWeatherClass(temperature.get())
           }
         />
-        {Math.round(temperature.get())}°
+        {Math.round(temperature.get()).toLocaleString(undefined, {})}°
       </Metric>
       <Metric>
         <Show when={isCharging()}>
@@ -207,7 +207,7 @@ export function MetricsWidget() {
           component={batterIconsOpts(battery.get())}
           class="w-5 h-5 transition-colors"
         />
-        {Math.round(battery.get())}%
+        {Math.round(battery.get()).toLocaleString(undefined, {})}%
       </Metric>
     </GroupItem>
   );

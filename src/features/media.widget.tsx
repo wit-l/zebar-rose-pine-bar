@@ -7,8 +7,7 @@ import {
   Show,
 } from "solid-js";
 import { MediaSession } from "zebar";
-import { Motion } from "solid-motionone";
-import { Presence } from "solid-motionone";
+import { Motion, Presence } from "solid-motionone";
 import { useProviders } from "@providers/index";
 import { GroupItem } from "@components/group.component";
 import { FaSolidCirclePlay, FaSolidCirclePause } from "solid-icons/fa";
