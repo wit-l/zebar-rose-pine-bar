@@ -127,7 +127,7 @@ export function MetricsWidget() {
   const cpuUsage = useMotionValue(0);
   const memoryUsage = useMotionValue(0);
   const temperature = useMotionValue(0);
-  const battery = useMotionValue(0);
+  const battery = useMotionValue(100);
   const [isCharging, setIsCharging] = createSignal(false);
   const [weatherStatus, setWeatherStatus] =
     createSignal<WeatherStatus>("clear_day");
@@ -199,16 +199,18 @@ export function MetricsWidget() {
         />
         {Math.round(temperature.get()).toLocaleString(undefined, {})}°
       </Metric>
-      <Metric>
-        <Show when={isCharging()}>
-          <BsLightningCharge />
-        </Show>
-        <Dynamic
-          component={batterIconsOpts(battery.get())}
-          class="w-5 h-5 transition-colors"
-        />
-        {Math.round(battery.get()).toLocaleString(undefined, {})}%
-      </Metric>
+      {!!providers.battery && (
+        <Metric>
+          <Show when={isCharging()}>
+            <BsLightningCharge />
+          </Show>
+          <Dynamic
+            component={batterIconsOpts(battery.get())}
+            class="w-5 h-5 transition-colors"
+          />
+          {Math.round(battery.get()).toLocaleString(undefined, {})}%
+        </Metric>
+      )}
     </GroupItem>
   );
 }
