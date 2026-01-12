@@ -127,7 +127,7 @@ export function MetricsWidget() {
   const cpuUsage = useMotionValue(0);
   const memoryUsage = useMotionValue(0);
   const temperature = useMotionValue(0);
-  const battery = useMotionValue(100);
+  const battery = useMotionValue(0);
   const [isCharging, setIsCharging] = createSignal(false);
   const [weatherStatus, setWeatherStatus] =
     createSignal<WeatherStatus>("clear_day");
@@ -199,7 +199,7 @@ export function MetricsWidget() {
         />
         {Math.round(temperature.get()).toLocaleString(undefined, {})}°
       </Metric>
-      {!!providers.battery && (
+      <Show when={!!providers.battery}>
         <Metric>
           <Show when={isCharging()}>
             <BsLightningCharge />
@@ -210,7 +210,7 @@ export function MetricsWidget() {
           />
           {Math.round(battery.get()).toLocaleString(undefined, {})}%
         </Metric>
-      )}
+      </Show>
     </GroupItem>
   );
 }
