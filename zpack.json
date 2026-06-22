@@ -3,8 +3,16 @@
   "name": "bar-rose-pine",
   "version": "0.0.3",
   "description": "Simple bar with rose-pine theme and komorebi/glazewm workspaces support",
-  "tags": ["workspaces", "komorebi", "rose-pine", "media", "glazewm"],
-  "previewImages": ["assets\\preview_1.png"],
+  "tags": [
+    "workspaces",
+    "komorebi",
+    "rose-pine",
+    "media",
+    "glazewm"
+  ],
+  "previewImages": [
+    "assets\\preview_1.png"
+  ],
   "repositoryUrl": "https://github.com/thearturca/zebar-rose-pine-bar",
   "widgets": [
     {
@@ -15,7 +23,9 @@
       "focused": false,
       "resizable": false,
       "transparent": true,
-      "includeFiles": ["dist/**/*"],
+      "includeFiles": [
+        "dist/**/*"
+      ],
       "caching": {
         "defaultDuration": 604800,
         "rules": []
@@ -55,7 +65,9 @@
       "focused": false,
       "resizable": false,
       "transparent": true,
-      "includeFiles": ["dist/**/*"],
+      "includeFiles": [
+        "dist/**/*"
+      ],
       "caching": {
         "defaultDuration": 604800,
         "rules": []
